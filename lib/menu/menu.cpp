@@ -1,73 +1,79 @@
 // menu.c
 #include "menu.h"
+#include "pulse.h"
+#include "global_variables.h"
 #include <Arduino.h>
+//#include <avr/pgmspace.h>
 
 // Function implementations
-void updateVariable1() {
-    Serial.println("Selected Toggle Force Mode");
+void toggleForceMode() {
+    if(forceModeActive){
+        forceModeActive = false;
+    } else{
+        forceModeActive = true;
+    }
+    Serial.print("Force mode: ");
+    Serial.println(forceModeActive);
+}
+
+void setDistance(){
+    pulseDistance += 10;
+    if(pulseDistance > 90){
+        pulseDistance = 10;
+    }
+    Serial.print("Pulse distance: ");
+    Serial.println(pulseDistance);
+}
+
+void setBpm(){
+    BPM += 10;
+    if(BPM > 100){
+        BPM = 20;
+    }
+    Serial.print("BPM: ");
+    Serial.println(BPM);
+}
+
+void setForce(){
+    maxForce += 10;
+    if(maxForce > 100){
+        maxForce = 10;
+    }
+    Serial.print("Max Force: ");
+    Serial.println(maxForce);
+}
+
+void updateVariable2() {
+    Serial.println("Changing BPM");
 }
 
 void startPulse() {
     Serial.println("Pulse started");
+    drivePulse = true;
 }
 
-Menu* createMenu(int size, char* name, MenuItem* items, Menu* parent) {
-    Menu* newMenu = (Menu*)malloc(sizeof(Menu) + sizeof(MenuItem) * (size));
-    if (newMenu) {
-        newMenu->name = name;
-        newMenu->size = size;
-        newMenu->parentMenu = parent;
-        newMenu->selected = 0;
-        for (int i = 0; i < size; i++) {
-            newMenu->entries[i] = items[i];
-        }
-        newMenu->selectedEntry = newMenu->entries[0];
-    }
-    return newMenu;
-}
-
-Menu* ForceSettings;
-Menu* Settings;
-Menu* Main;
-
-
-MenuItem itemsForceSettings[2] = {
-    {"Toggle Force Mode", NULL, updateVariable1},
-    {"Max Force", NULL, NULL}
+Menu Settings = {
+    "Settings Menu",
+    {
+        {"BPM", NULL, setBpm},
+        {"Distance", NULL, setDistance},
+        {"Force Mode", NULL, toggleForceMode},
+        {"Max Force", NULL, setForce},
+    },
+    4, // Number of entries
+    0  // Initially selected entry
 };
 
-//const int forceSettingsSize = sizeof(itemsForceSettings) / sizeof(MenuItem);
 
-MenuItem itemsSettings[1]; 
-//const int settingsSize = sizeof(itemsSettings) / sizeof(MenuItem);
-
-MenuItem itemsMain[2]; 
-//const int mainSize = sizeof(itemsMain) / sizeof(MenuItem);
-
-
-
-
-void initializeMenus() {
-
-    ForceSettings = createMenu(2, "Menu Force Settings", itemsForceSettings, NULL);
-
-    itemsSettings[0] = {"Force Settings", ForceSettings, NULL}; 
-    Settings = createMenu(1, "Menu Settings", itemsSettings, NULL); 
-
-    itemsMain[0] = {"Start Pulse", NULL, startPulse}; 
-    itemsMain[1] = {"Settings", Settings, NULL};
-    Main = createMenu(2, "Menu Main", itemsMain, NULL); 
-
-    Settings->parentMenu = Main; 
-    ForceSettings->parentMenu = Settings; 
-}
-
-
-
-void printEntries(Menu* menu){
-    for(int i = 0; i < menu->size; i++){
-        Serial.println(menu->entries[i].name);
-    }
-}
+// Example main menu
+Menu Main = {
+    "Main Menu",
+    {
+        {"Start Pulse", NULL, startPulse},
+        {"Settings", &Settings, NULL}, // Link to sub-menu
+    },
+    2, // Number of entries
+    0  // Initially selected entry
+};
 
 

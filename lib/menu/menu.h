@@ -1,29 +1,29 @@
 #ifndef MENU_H
 #define MENU_H
+#include <stdlib.h>
+#include <Arduino.h>
+
+#define MAX_MENU_ITEMS 10
 
 typedef struct MenuItem {
-    const char* name;
-    struct Menu* subMenu;
+    char* name;
+    struct Menu* subMenu; // Pointer to sub-menu
     void (*action)();
 } MenuItem;
 
 typedef struct Menu {
-  char* name; //For debugging
-  int size;
-  int selected;
-  MenuItem selectedEntry;
-  struct Menu* parentMenu; // Added struct keyword for clarity
-  MenuItem entries[];
+    const char* name;
+    MenuItem entries[MAX_MENU_ITEMS];
+    int size;
+    int selected;
 } Menu;
+
+// Function prototypes
+void startPulse();
 
 // extern MenuItem forceSettingsEntries[];
 // extern MenuItem mSettings[];
 // extern MenuItem mMain[];
 extern Menu* currentMenu;
-
-
-void initializeMenus();
-void updateVariable1();
-void startPulse();
 
 #endif // MENU_H
