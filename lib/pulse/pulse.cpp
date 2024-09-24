@@ -8,7 +8,7 @@ Pulse::Pulse(int pin) {
 }
 
 Pulse::Pulse(){
-    ;
+    ; //Weird but works
 }
 
 void Pulse::attachServo(int pin){
