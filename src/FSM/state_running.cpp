@@ -10,7 +10,20 @@
 Servo myServo;
 extern FSM* fsm;
 extern StateConfiguring configState;
+extern EventQueue eventQueue;
 
+enum ServoState {
+  IDLE,
+  MOVING_TO_POSITION,
+  HOLDING_POSITION,
+  RETURNING,
+  WAITING_BPM
+};
+
+unsigned long previousMillis = 0; 
+unsigned long interval = 0;        
+
+ServoState currentState = IDLE;
 //This should be moved to somewhere more fitting
 unsigned long bpmToDelay(float bpm){
     // Add max bpm check?
@@ -21,28 +34,38 @@ unsigned long bpmToDelay(float bpm){
 }
 
 void StateRunning::handle() {
-    Serial.println("Handling Running State...");
+    //Serial.println("Handling Running State...");
+    unsigned long currentMillis = millis();
 
-    //if(!pulseVars.forceMode){
-        int pos = 0;
-        int increment = 1;
+    if (!pulseVars.forceMode) {
+    switch (currentState) {
+      case IDLE:
+        // Move to the specified distance
         myServo.write(pulseVars.distance);
-        delay(100);
-        myServo.write(0);
-        delay(bpmToDelay(pulseVars.BPM));
-    //}
+        previousMillis = currentMillis;  // Record the current time
+        interval = 100;  // Set interval to hold the position for 100ms
+        currentState = MOVING_TO_POSITION;
+        break;
 
+      case MOVING_TO_POSITION:
+        // Wait until 100ms has passed
+        if (currentMillis - previousMillis >= interval) {
+          // Return to zero position
+          myServo.write(0);
+          previousMillis = currentMillis;  // Reset the timer
+          interval = bpmToDelay(pulseVars.BPM);  // Set interval based on BPM
+          currentState = RETURNING;
+        }
+        break;
 
-    // for (pos = 0; pos <= pulseVars.distance; pos += increment) {
-    //     myServo.write(pos);   
-    //     delay(15);   
-    // }
-
-    
-    // for (pos = pulseVars.distance; pos >= 0; pos -= increment) {
-    //     myServo.write(pos);   
-    //     delay(15);    
-    // }
+      case RETURNING:
+        // Wait until the BPM delay has passed before starting the next pulse
+        if (currentMillis - previousMillis >= interval) {
+          currentState = IDLE;  // Go back to the idle state to start the next cycle
+        }
+        break;
+    }
+  }
 }
 
 void StateRunning::handleEvent(const Event& event) {
@@ -61,12 +84,12 @@ void StateRunning::onEnter() {
     Serial.println("Entering Running state.");
     myServo.attach(servoPin, 900, 2000);  // Attach the servo to pin 18
     myServo.setPeriodHertz(50);
-    // Additional entry logic, if needed
+    myServo.write(0);
 }
 
 void StateRunning::onExit() {
     Serial.println("Exiting Running state.");
     myServo.detach();
-    // Additional exit logic, if needed
+  
 }
     
