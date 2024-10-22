@@ -93,7 +93,7 @@ void renderMenu(Menu* menu) {
             display.print("  "); 
             display.setTextColor(SSD1306_WHITE);
         }
-        display.print(menu->entries[i].name);
+        display.print(menu->entries[i].name.c_str());
         if(menu->entries[i].associatedValue != NULL){
             display.print(":");
             display.print(*menu->entries[i].associatedValue);

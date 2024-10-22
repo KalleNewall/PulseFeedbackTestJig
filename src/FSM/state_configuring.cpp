@@ -69,12 +69,13 @@ void StateConfiguring::handleEvent(const Event& event) {
 void StateConfiguring::onEnter() {
     Serial.println("Entering Config state.");
     currentMenu->selected = 0;
-    //renderMenu(currentMenu);
-    // Additional entry logic, if needed
+    currentMenu->entries[0].name = "Start Pulse";
+    renderMenu(currentMenu);
 }
 
 void StateConfiguring::onExit() {
     Serial.println("Exiting Config state.");
-    // Additional exit logic, if needed
+    currentMenu->entries[0].name = "Stop Pulse";
+    renderMenu(currentMenu);
 }
     

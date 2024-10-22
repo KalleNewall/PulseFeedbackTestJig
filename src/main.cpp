@@ -20,10 +20,11 @@ StateRunning runningState;
 
 void setup() {
     Serial.begin(9600);
-    fsm = new FSM(&configState, &eventQueue);
 
     initJoystick();
     initDisplay();
+    
+    fsm = new FSM(&configState, &eventQueue);
 
     renderMenu(currentMenu);
 }

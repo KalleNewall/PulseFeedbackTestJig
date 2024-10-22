@@ -6,14 +6,14 @@
 #define MAX_MENU_ITEMS 10
 
 typedef struct MenuItem {
-    char* name;
+    std::string name;
     struct Menu* subMenu; // Pointer to sub-menu
     void (*action)();
     int* associatedValue;
 } MenuItem;
 
 typedef struct Menu {
-    const char* name;
+    std::string name;
     MenuItem entries[MAX_MENU_ITEMS];
     int size;
     int selected;
