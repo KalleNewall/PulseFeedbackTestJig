@@ -21,6 +21,12 @@ void toggleForceMode() {
     Serial.println(pulseVars.forceMode);
 }
 
+void toggleCurveMode() {
+    pulseVars.bloodPressureCurveMode = (pulseVars.bloodPressureCurveMode == 1) ? 0 : 1; 
+    Serial.print("Curve mode: ");
+    Serial.println(pulseVars.bloodPressureCurveMode);
+}
+
 void setDistance(){
     pulseVars.distance += 5;
     if(pulseVars.distance > 30){
@@ -64,9 +70,10 @@ Menu Settings = {
         {"BPM", NULL, setBpm, &pulseVars.BPM},
         {"Distance", NULL, setDistance, &pulseVars.distance},
         {"Force Mode", NULL, toggleForceMode, &pulseVars.forceMode},
+        {"Pressure Mode", NULL, toggleCurveMode, &pulseVars.bloodPressureCurveMode},
         {"Max Force", NULL, setForce, &pulseVars.maxForce},
     },
-    4, // Number of entries
+    5, // Number of entries
     0  // Initially selected entry
 };
 

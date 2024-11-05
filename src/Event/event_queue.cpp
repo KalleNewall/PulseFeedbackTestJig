@@ -11,7 +11,7 @@ Event EventQueue::pop() {
         queue.pop();
         return event;
     }
-    return { EventType::None, 0 }; // Return a default "None" event if the queue is empty
+    return { EventType::None, 0 }; 
 }
 
 bool EventQueue::isEmpty() const {

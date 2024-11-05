@@ -13,6 +13,6 @@ enum class EventType {
 
 struct Event {
     EventType type;
-    int value; // You can add additional data if needed
+    int value; 
 };
     
