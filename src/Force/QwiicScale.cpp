@@ -9,6 +9,10 @@
 
 QwiicScale::QwiicScale() : avgWeightSpot(0), settingsDetected(false) {}
 
+float found_calibration_factor = 586.97;
+int32_t found_setting_zero_offset = -8381420;
+
+
 void QwiicScale::begin() {
     EEPROM.begin(EEPROM_SIZE);
     Wire.begin();
@@ -18,16 +22,16 @@ void QwiicScale::begin() {
         Serial.println("Scale not detected. Please check wiring.");
         while (1);
     }
-    Serial.println("Scale detected!");
+    //Serial.println("Scale detected!");
 
     readSystemSettings();
     myScale.setSampleRate(NAU7802_SPS_320);
     myScale.calibrateAFE();
 
-    Serial.print("Zero offset: ");
-    Serial.println(myScale.getZeroOffset());
-    Serial.print("Calibration factor: ");
-    Serial.println(myScale.getCalibrationFactor());
+    // Serial.print("Zero offset: ");
+    // Serial.println(myScale.getZeroOffset());
+    // Serial.print("Calibration factor: ");
+    // Serial.println(myScale.getCalibrationFactor());
 }
 
 void QwiicScale::calibrateScale() {
@@ -65,18 +69,18 @@ void QwiicScale::readSystemSettings() {
 
     EEPROM.get(LOCATION_CALIBRATION_FACTOR, settingCalibrationFactor);
     if (settingCalibrationFactor == 0xFFFFFFFF) {
-        settingCalibrationFactor = 1.0;
+        settingCalibrationFactor = found_calibration_factor;
         EEPROM.put(LOCATION_CALIBRATION_FACTOR, settingCalibrationFactor);
     }
 
     EEPROM.get(LOCATION_ZERO_OFFSET, settingZeroOffset);
     if (settingZeroOffset == 0xFFFFFFFF) {
-        settingZeroOffset = 0;
+        settingZeroOffset = found_setting_zero_offset;
         EEPROM.put(LOCATION_ZERO_OFFSET, settingZeroOffset);
     }
 
-    myScale.setCalibrationFactor(settingCalibrationFactor);
-    myScale.setZeroOffset(settingZeroOffset);
+    myScale.setCalibrationFactor(found_calibration_factor);
+    myScale.setZeroOffset(found_setting_zero_offset);
 
     settingsDetected = (settingCalibrationFactor != 1.0 && settingZeroOffset != 0);
 }

@@ -18,11 +18,17 @@ StateConfiguring configState;
 StateRunning runningState;
 
 
+
 void setup() {
+    delay(100);
     Serial.begin(9600);
+    delay(100);
+    esp_log_level_set("*", ESP_LOG_NONE);
+    esp_log_level_set("ESP32PWM", ESP_LOG_NONE); 
 
     initJoystick();
     initDisplay();
+    
     
     fsm = new FSM(&configState, &eventQueue);
 
@@ -33,8 +39,5 @@ void loop() {
     fsm->update();
 
     updateJoystick();
-    
-
-    //delay(100); 
 }
     

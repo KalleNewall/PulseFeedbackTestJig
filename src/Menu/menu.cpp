@@ -17,14 +17,14 @@ PulseVariables pulseVars;
 // Function implementations
 void toggleForceMode() {
     pulseVars.forceMode = (pulseVars.forceMode == 1) ? 0 : 1; 
-    Serial.print("Force mode: ");
-    Serial.println(pulseVars.forceMode);
+    // Serial.print("Force mode: ");
+    // Serial.println(pulseVars.forceMode);
 }
 
 void toggleCurveMode() {
     pulseVars.bloodPressureCurveMode = (pulseVars.bloodPressureCurveMode == 1) ? 0 : 1; 
-    Serial.print("Curve mode: ");
-    Serial.println(pulseVars.bloodPressureCurveMode);
+    // Serial.print("Curve mode: ");
+    // Serial.println(pulseVars.bloodPressureCurveMode);
 }
 
 void setDistance(){
@@ -32,8 +32,8 @@ void setDistance(){
     if(pulseVars.distance > 30){
         pulseVars.distance = 10;
     }
-    Serial.print("Pulse distance: ");
-    Serial.println(pulseVars.distance);
+    //Serial.print("Pulse distance: ");
+    //Serial.println(pulseVars.distance);
 }
 
 void setBpm(){
@@ -41,8 +41,8 @@ void setBpm(){
     if(pulseVars.BPM >= 120){
         pulseVars.BPM = 60;
     }
-    Serial.print("BPM: ");
-    Serial.println(pulseVars.BPM);
+    //Serial.print("BPM: ");
+    //Serial.println(pulseVars.BPM);
 }
 
 void setForce(){
@@ -51,8 +51,8 @@ void setForce(){
         pulseVars.maxForce = 10;
     }
 
-    Serial.print("Max Force: ");
-    Serial.println(pulseVars.maxForce);
+    //Serial.print("Max Force: ");
+    //Serial.println(pulseVars.maxForce);
 }
 
 void updateVariable2() {
@@ -60,7 +60,7 @@ void updateVariable2() {
 }
 
 void startPulse() {
-    Serial.println("Pulse started");
+    //Serial.println("Pulse started");
     eventQueue.push({ EventType::StartPulse, 0 });
 }
 
