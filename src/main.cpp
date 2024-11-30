@@ -9,6 +9,8 @@
 #include "Input/input.hpp"
 #include "Menu/menu.hpp"
 
+#include <WiFi.h>
+
 //Event queue declared in global_variables.hpp, structure in Event folder
 EventQueue eventQueue;
 
@@ -20,6 +22,8 @@ StateRunning runningState;
 
 
 void setup() {
+    WiFi.mode(WIFI_OFF);
+    WiFi.disconnect();
     delay(100);
     Serial.begin(9600);
     delay(100);

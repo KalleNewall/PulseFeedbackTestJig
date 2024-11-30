@@ -4,10 +4,10 @@
 extern EventQueue eventQueue;
 
 extern struct PulseVariables{
-    int distance = 10;
+    int distance = 1;
     int BPM = 60;
     int forceMode = 0;
-    int maxForce = 20;
+    int maxForce = 14400;
     int bloodPressureCurveMode = 0;
 }pulseVars;
 

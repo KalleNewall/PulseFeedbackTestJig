@@ -28,9 +28,9 @@ void toggleCurveMode() {
 }
 
 void setDistance(){
-    pulseVars.distance += 5;
-    if(pulseVars.distance > 30){
-        pulseVars.distance = 10;
+    pulseVars.distance += 1;
+    if(pulseVars.distance > 10){
+        pulseVars.distance = 1;
     }
     //Serial.print("Pulse distance: ");
     //Serial.println(pulseVars.distance);
@@ -46,9 +46,9 @@ void setBpm(){
 }
 
 void setForce(){
-    pulseVars.maxForce += 10;
-    if(pulseVars.maxForce >= 100){
-        pulseVars.maxForce = 10;
+    pulseVars.maxForce += 50;
+    if(pulseVars.maxForce >= 14800){
+        pulseVars.maxForce = 14400;
     }
 
     //Serial.print("Max Force: ");

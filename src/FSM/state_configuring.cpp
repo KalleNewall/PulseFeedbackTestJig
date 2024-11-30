@@ -71,11 +71,13 @@ void StateConfiguring::onEnter() {
     currentMenu->selected = 0;
     currentMenu->entries[0].name = "Start Pulse";
     renderMenu(currentMenu);
+    delay(100); //Joystick debounce hack
 }
 
 void StateConfiguring::onExit() {
     // Serial.println("Exiting Config state.");
     currentMenu->entries[0].name = "Stop Pulse";
     renderMenu(currentMenu);
+    delay(100); //Joystick debounce hack
 }
     

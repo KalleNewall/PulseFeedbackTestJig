@@ -28,14 +28,19 @@ int measurement_counter = 0;
 int measurement_counter_top = 10;
 
 unsigned long previousMillis = 0; 
-unsigned long timeBetweenPulses = 0;        
+unsigned long timeBetweenPulses = 0;     
+unsigned long newPulseTime = 0;   
 
 int currentServoPosition = 0;  // Track the current servo position
 int stepSize = 2;              // Servo movement step size
 
-int servoStartPos = 110; // Degrees
-int servoEndPos = 120; // Default value, set based on settings
+int servoStartPos = 105; // Degrees
+int servoEndPos = 105; // Default value, set based on settings
 int timeAtOuterPosition = 200; // ms
+
+
+unsigned long endTime; //DEBUG
+unsigned long startTime; //DEBUG
 
 ServoState currentServoState = IDLE;
 //This should be moved to somewhere more fitting
@@ -67,38 +72,32 @@ void StateRunning::driveServoBloodPressureCurve() {
 
     // Move the servo to the calculated position
     myServo.write(servoPosition);
-
-    // Debugging information for monitoring
-    // Serial.print("Time: ");
-    // Serial.print(millis());
-    // Serial.print(", Pressure: ");
-    // Serial.print(pressureData[dataPointIndex]);
-    // Serial.print(", Servo Position: ");
-    // Serial.println(servoPosition);
 }
 
 void StateRunning::handle() {
     //Serial.println("Handling Running State...");
     unsigned long currentMillis = millis();
-    measurement_counter++;
+    //measurement_counter++;
     float currentForce; // = 0 (?)
 
     if(pulseVars.bloodPressureCurveMode){
       driveServoBloodPressureCurve();
       return;
     }
+    int potentiometerValue = analogRead(potentiometerPin);
+    Serial.println(potentiometerValue);
+
     //if(measurement_counter == measurement_counter_top){
       myScale.update();
       currentForce = myScale.getAverageWeight();  
-      Serial.print("Scale_value: ");
+      //Serial.print("Scale_value: ");
       Serial.println(currentForce);
-      measurement_counter = 0;
+      //measurement_counter = 0;
     //}
-    int potentiometerValue = analogRead(potentiometerPin);
-    Serial.print("Potentiometer_value: ");
-    Serial.println(potentiometerValue);
-    // Serial.print("Current force: ");
-    // Serial.println(currentForce);
+    Serial.println(millis());
+    Serial.println("\t");
+
+    
     switch (currentServoState) {
 
       case IDLE:
@@ -108,25 +107,23 @@ void StateRunning::handle() {
         timeBetweenPulses = 100;  // Set timeBetweenPulses for step movement 
         myServo.write(servoEndPos);
         currentServoState = MOVING_TO_POSITION;
-        delay(10);
+        timeBetweenPulses = bpmToDelay(pulseVars.BPM);
+        newPulseTime = millis()+timeBetweenPulses;
+        delay(1);
         break;
 
       case MOVING_TO_POSITION:
-        // Move the servo in steps and check the force
-        //if (currentMillis - previousMillis >= timeBetweenPulses) {
-          // Move the servo by the step size
-          //currentServoPosition -= stepSize;
-          //myServo.write(currentServoPosition);
-          //previousMillis = currentMillis;  // Reset the timer
+        
 
           // If in force mode and the current force exceeds the max force, stop
           if (pulseVars.forceMode && currentForce > pulseVars.maxForce) {
-              Serial.println("Force exceeded max force! Stopping servo.");
-              Serial.print("Force was: ");
-              Serial.println(currentForce);
+              // Serial.println("Force exceeded max force! Stopping servo.");
+              // Serial.print("Force was: ");
+              // Serial.println(currentForce);
+              //delay(50);
               myServo.write(servoStartPos); // Move back to start position
               previousMillis = currentMillis;  // Reset the timer
-              timeBetweenPulses = bpmToDelay(pulseVars.BPM);  // Set timeBetweenPulses based on BPM
+             
               currentServoState = RETURNING;  // Move to the RETURNING state
           }
 
@@ -136,16 +133,14 @@ void StateRunning::handle() {
               myServo.write(servoStartPos);  // Move back to start position
               timeBetweenPulses = bpmToDelay(pulseVars.BPM);  // Set timeBetweenPulses based on BPM
               currentServoState = RETURNING;  // Move to the RETURNING state
-              delay(10);
           }
         //}
         break;
 
       case RETURNING:
         // Wait until the BPM delay has passed before starting the next pulse
-        if (currentMillis - previousMillis >= timeBetweenPulses) {
+        if (currentMillis >= newPulseTime) {
           currentServoState = IDLE;  // Go back to the idle state to start the next cycle
-          delay(10);
         }
         break;
     }
@@ -171,8 +166,6 @@ void StateRunning::onEnter() {
     servoEndPos = servoStartPos - pulseVars.distance;
 
     myScale.begin();
-    //myScale.calibrateScale();
-    //Serial.println("Qwiic scale initialized.");
 }
 
 void StateRunning::onExit() {

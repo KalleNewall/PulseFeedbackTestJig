@@ -24,9 +24,13 @@ void QwiicScale::begin() {
     }
     //Serial.println("Scale detected!");
 
-    readSystemSettings();
+    //readSystemSettings();
+    myScale.setChannel1Offset(found_setting_zero_offset);
+    myScale.setCalibrationFactor(found_calibration_factor);
+    myScale.setGain(NAU7802_GAIN_16);
+    myScale.setLDO(NAU7802_LDO_3V0);
     myScale.setSampleRate(NAU7802_SPS_320);
-    myScale.calibrateAFE();
+    myScale.calibrateAFE(NAU7802_CALMOD_OFFSET);
 
     // Serial.print("Zero offset: ");
     // Serial.println(myScale.getZeroOffset());

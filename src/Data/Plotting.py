@@ -1,51 +1,74 @@
 import matplotlib.pyplot as plt
-import csv
 
-input_file = "src\Data\data-20241128-122631"  
+# File paths
+input_file = "src\Data\data-20241130-144225"
 output_file = "cleaned_data.csv"
 
-with open(input_file, "r") as infile, open(output_file, "w") as outfile:
+# Clean the input file
+with open(input_file, "r", encoding="utf-8", errors="ignore") as infile, open(output_file, "w", encoding="utf-8") as outfile:
     for line in infile:
-        if line.startswith("=") or "PuTTY log" in line:
+        if line.startswith("=") or "PuTTY log" in line or line.strip() == "":
             continue
-        
-        outfile.write(line)
+        try:
+            outfile.write(line.strip() + "\n")
+        except UnicodeDecodeError:
+            print(f"Skipped a malformed line: {line}")
 
 print(f"Cleaned data saved to {output_file}")
 
-scale_values = []
+# Initialize data containers
 potentiometer_values = []
+scale_values = []
+time_values = []
 
-with open(output_file, "r") as csvfile:
-    reader = csv.reader(csvfile, delimiter=':')
-    for row in reader:
-        if len(row) == 2:  # Ensure row has a label and value
-            key, value = row[0].strip(), row[1].strip()
-            if key == "Scale_value":
-                scale_values.append(float(value))
-            elif key == "Potentiometer_value":
-                potentiometer_values.append(int(value))
+# Read and process the cleaned data file
+with open(output_file, "r", encoding="utf-8") as datafile:
+    data_lines = [line.strip() for line in datafile if line.strip()]
 
-NUM_POINTS_TO_SKIP = 5
-scale_values = scale_values[NUM_POINTS_TO_SKIP:]
-potentiometer_values = potentiometer_values[NUM_POINTS_TO_SKIP:]
+    # Each set of three lines corresponds to one data point
+    for i in range(0, len(data_lines), 3):
+        try:
+            potentiometer_values.append(int(data_lines[i]))  # First value: Potentiometer
+            scale_values.append(float(data_lines[i + 1]))    # Second value: Load cell
+            time_values.append(int(data_lines[i + 2]))       # Third value: Time in millis
+        except (ValueError, IndexError):
+            print(f"Skipped malformed data point at line {i}: {data_lines[i:i+3]}")
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))  # Two rows, one column
+# Normalize time values to start at 0
+start_time = time_values[0]
+time_values = [t - start_time for t in time_values]
 
-ax1.plot(scale_values, label="Scale Value", linestyle="--", marker="o")
-ax1.set_title("Scale Values Over Time")
-ax1.set_xlabel("Sample Index")
-ax1.set_ylabel("Scale Value")
+# Conversion factor from ADC to mm
+adc_to_mm_factor = 0.00195  # mm per ADC step
+
+# Conversion factor from grams to Newtons
+grams_to_newtons_factor = 0.00980665  # Newtons per gram
+
+# Convert potentiometer values from ADC to millimeters
+potentiometer_mm_values = [adc_value * adc_to_mm_factor for adc_value in potentiometer_values]
+
+# Convert scale values from grams to Newtons
+scale_newton_values = [scale_value * grams_to_newtons_factor for scale_value in scale_values]
+
+# Plotting the data
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+
+# Plot potentiometer values (mm) against normalized time (ms)
+ax1.plot(time_values, potentiometer_mm_values, label="Pulse Amplitude [mm]", linestyle="-", marker="o")
+ax1.set_title("Pulse Position Over Time")
+ax1.set_xlabel("Time [ms]")
+ax1.set_ylabel("Pulse Amplitude [mm]")
 ax1.legend()
 ax1.grid(True)
 
-ax2.plot(potentiometer_values, label="Potentiometer Value", linestyle="-", marker="x", color="orange")
-ax2.set_title("Potentiometer Values Over Time")
-ax2.set_xlabel("Sample Index")
-ax2.set_ylabel("Potentiometer Value")
+# Plot scale values (Newtons) against normalized time (ms)
+ax2.plot(time_values, scale_newton_values, label="Force [N]", linestyle="--", marker="x", color="orange")
+ax2.set_title("Pulse Force Over Time")
+ax2.set_xlabel("Time [ms]")
+ax2.set_ylabel("Force [N]")
 ax2.legend()
 ax2.grid(True)
 
-
+# Adjust layout and display the plot
 plt.tight_layout()
 plt.show()
