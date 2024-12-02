@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 # File paths
-input_file = "src\Data\data-20241201-141651"
+input_file = "src\Data\data-20241202-123122"
 output_file = "cleaned_data.csv"
 
 # Clean the input file

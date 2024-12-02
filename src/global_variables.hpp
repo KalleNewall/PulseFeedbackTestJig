@@ -7,7 +7,7 @@ extern struct PulseVariables{
     int distance = 1;
     int BPM = 60;
     int forceMode = 0;
-    int maxForce = 14400;
+    int maxForce = 10;
     int bloodPressureCurveMode = 0;
 }pulseVars;
 

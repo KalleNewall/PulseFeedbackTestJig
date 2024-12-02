@@ -46,9 +46,9 @@ void setBpm(){
 }
 
 void setForce(){
-    pulseVars.maxForce += 50;
-    if(pulseVars.maxForce >= 14800){
-        pulseVars.maxForce = 14400;
+    pulseVars.maxForce += 10;
+    if(pulseVars.maxForce >= 110){
+        pulseVars.maxForce = 10;
     }
 
     //Serial.print("Max Force: ");

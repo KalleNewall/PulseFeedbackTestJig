@@ -109,7 +109,7 @@ void StateRunning::handle() {
         currentServoState = MOVING_TO_POSITION;
         timeBetweenPulses = bpmToDelay(pulseVars.BPM);
         newPulseTime = millis()+timeBetweenPulses;
-        //delay(1);
+        delay(1);
         break;
 
       case MOVING_TO_POSITION:
