@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 # File paths
-input_file = "src\Data\data-20241130-144225"
+input_file = "src\Data\data-20241201-141651"
 output_file = "cleaned_data.csv"
 
 # Clean the input file
@@ -39,7 +39,9 @@ start_time = time_values[0]
 time_values = [t - start_time for t in time_values]
 
 # Conversion factor from ADC to mm
-adc_to_mm_factor = 0.00195  # mm per ADC step
+adc_to_mm_factor = 0.01035  # mm per ADC step
+
+#adc_to_mm_factor = 0.0659 # degrees per ADC step
 
 # Conversion factor from grams to Newtons
 grams_to_newtons_factor = 0.00980665  # Newtons per gram
